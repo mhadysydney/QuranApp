@@ -1,11 +1,10 @@
 package com.soft224.coranapp;
 
-import javax.print.attribute.standard.Media;
 import javax.swing.*;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 public class VideoPlayer extends JDialog {
-    private EmbeddedMediaPlayerComponent player;
+    private final EmbeddedMediaPlayerComponent player;
     public VideoPlayer(JFrame parent,boolean modal){
         super(parent,modal);
         player=new EmbeddedMediaPlayerComponent();
@@ -14,15 +13,22 @@ public class VideoPlayer extends JDialog {
         this.setResizable(false);
         this.setContentPane(player);
         this.setUndecorated(true);
+
     }
 
     public void lunchVideo(String url){
         this.setVisible(true);
         player.mediaPlayer().media().play(url);
-        player.mediaPlayer().menu().activate();
 
+        //player.mediaPlayer().menu().activate();
+    }
+    public long getLength(){
+        return player.mediaPlayer().status().length();
     }
 
+    public float getCurrentPos(){
+        return player.mediaPlayer().status().position();
+    }
     public void showLocation(int x,int y){
         this.setLocation(x,y);
     }

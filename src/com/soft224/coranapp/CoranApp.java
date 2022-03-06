@@ -1,18 +1,19 @@
 package com.soft224.coranapp;
 
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class CoranApp{
     VideoPlayer videoPlayer;
-    private JLabel screen;
-
+    int vpX,vpY;
     public CoranApp(){
 
         ImageIcon imageIcon = new ImageIcon("fatiha.png");
@@ -50,10 +51,10 @@ public class CoranApp{
         controller.add(pause);
         controller.add(next);
 
-        int vpX=frame.getX()+width,vpY=frame.getY()+height;
-
+        vpX=frame.getX()+width;vpY=frame.getY()+height;
+        vpX=vpX-210;vpY=vpY-180;
         plate.setLayout(null);
-        screen=new JLabel("");
+        JLabel screen = new JLabel("");
         //frame.setContentPane(plate);
         screen.setIcon(imageIcon);
         screen.setBackground(Color.white);
@@ -63,22 +64,35 @@ public class CoranApp{
         frame.setVisible(true);
         videoPlayer=new VideoPlayer(frame,false);
 
-        videoPlayer.showLocation(vpX-210,vpY-180);
+        videoPlayer.showLocation(vpX,vpY);
         File video=new File("01_1_1.mp4");
         var vPath=video.getAbsolutePath();
-        System.out.println("vpath "+vPath);
+        //System.out.println("vpath "+vPath);
         videoPlayer.lunchVideo(vPath);
+        /*final long[] videoLen = {0};
+        Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+               videoLen[0] = videoPlayer.getLength();
+                //System.out.println("videoLen "+ videoLen[0]);
+            }
+        },2000);*/
+
+
         pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 var pTxt=pause.getText();
-
+                System.out.println("current pos:"+videoPlayer.getCurrentPos());
                 if (pTxt.equals("||")) {
                     videoPlayer.setPause();
+                    pause.setText(">");
                 } else {
                     videoPlayer.setPlay();
+                    pause.setText("||");
                 }
-                pause.setText(pTxt.equals("||") ? ">":"||");
+
                 pause.setBackground(new Color(0,0,0, 0));
 
             }
@@ -100,6 +114,26 @@ public class CoranApp{
                 next.setBackground(new Color(0,0,0, 0));
             }
         });
+
+        frame.addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent windowEvent) {
+                System.out.println("frame coord: "+frame.getBounds());
+            }
+        });
+
+        while(true){
+            var cTime=videoPlayer.getCurrentPos();
+            //System.out.println("FrameBounds "+frame.getBounds());
+            if(cTime>=0.5) {
+                vpX = frame.getX() + 2;
+                vpY = frame.getY() + 10;
+            }else{
+                vpX=frame.getX()+width;vpY=frame.getY()+height;
+                vpX=vpX-210;vpY=vpY-180;
+            }
+            videoPlayer.showLocation(vpX,vpY);
+        }
     }
     public static void main(String[] arg){
 
